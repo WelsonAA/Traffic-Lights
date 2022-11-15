@@ -675,7 +675,7 @@ END GROUP
  .debug_abbrev  0x000008f7       0x60 MCAL/Interrupts Driver/interrupts.o
  .debug_abbrev  0x00000957       0xd3 MCAL/Timer Driver/tmr.o
 
-.debug_line     0x00000000      0xf35
+.debug_line     0x00000000      0xf3b
  *(.debug_line .debug_line.* .debug_line_end)
  .debug_line    0x00000000      0x116 D:/Edge Downloads/7.0/Packs/atmel/ATmega_DFP/1.7.374/gcc/dev/atmega32/avr5/crtatmega32.o
  .debug_line    0x00000116      0x261 App/app.o
@@ -685,7 +685,7 @@ END GROUP
  .debug_line    0x000009ba       0x6d main.o
  .debug_line    0x00000a27      0x2da MCAL/DIO Driver/dio.o
  .debug_line    0x00000d01       0xb9 MCAL/Interrupts Driver/interrupts.o
- .debug_line    0x00000dba      0x17b MCAL/Timer Driver/tmr.o
+ .debug_line    0x00000dba      0x181 MCAL/Timer Driver/tmr.o
 
 .debug_frame    0x00000000      0x25c
  *(.debug_frame)

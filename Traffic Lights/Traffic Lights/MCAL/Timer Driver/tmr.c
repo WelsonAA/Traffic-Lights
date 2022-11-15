@@ -22,10 +22,10 @@ EN_timerError_T TIMER_delay(uint16_t millisec) {
     tTick = 256.0/1000.0; //ms    tTick = Presc/FCPU
     tMax= 65.536; //ms		tMax = tTick * 2^8
     if(millisec<tMax){
-        tmrInitial = (tMax-millisec)/tTick;
+        tmrInitial = ((tMax-millisec)/tTick);
         N = 1;
 
-    }else if(millisec == (uint32_t)tMax){
+    }else if(millisec == ((uint32_t)tMax)){
         tmrInitial=0;
         N=1;
     }else{
@@ -35,15 +35,13 @@ EN_timerError_T TIMER_delay(uint16_t millisec) {
     }
     TCNT0 = tmrInitial;
     SET_BIT(TCCR0,BIT_2);//set 256 prescaler
-    while(overFlowcnt<N){
-        //busy wait
-        while(CHECK_BIT(TIFR,BIT_0)==LOW);
-        //clear overflow flag
-        SET_BIT(TIFR,BIT_0);
-        //increment counter
-        overFlowcnt++;
+	for(overFlowcnt;overFlowcnt<N;overFlowcnt++){
+    //while(overFlowcnt<N){
+        while(CHECK_BIT(TIFR,BIT_0)==LOW); //busy wait
+        SET_BIT(TIFR,BIT_0);// overflow flag to zero
+        
     }
-    //Timer stop
+    //Timer stopper
     TIMER_init();
     return TIMER_OK;
 }

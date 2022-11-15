@@ -19,15 +19,15 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING
   7 .debug_abbrev 00000a2a  00000000  00000000  0000259e  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_line   00000f35  00000000  00000000  00002fc8  2**0
+  8 .debug_line   00000f3b  00000000  00000000  00002fc8  2**0
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_frame  0000025c  00000000  00000000  00003f00  2**2
+  9 .debug_frame  0000025c  00000000  00000000  00003f04  2**2
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_str    00000714  00000000  00000000  0000415c  2**0
+ 10 .debug_str    00000714  00000000  00000000  00004160  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_loc    00000a62  00000000  00000000  00004870  2**0
+ 11 .debug_loc    00000a62  00000000  00000000  00004874  2**0
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_ranges 00000188  00000000  00000000  000052d2  2**0
+ 12 .debug_ranges 00000188  00000000  00000000  000052d6  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -1790,7 +1790,7 @@ EN_timerError_T TIMER_delay(uint16_t millisec) {
  884:	0e 94 34 05 	call	0xa68	; 0xa68 <__cmpsf2>
  888:	88 23       	and	r24, r24
  88a:	9c f4       	brge	.+38     	; 0x8b2 <__stack+0x53>
-        tmrInitial = (tMax-millisec)/tTick;
+        tmrInitial = ((tMax-millisec)/tTick);
  88c:	a7 01       	movw	r20, r14
  88e:	96 01       	movw	r18, r12
  890:	6f e6       	ldi	r22, 0x6F	; 111
@@ -1809,7 +1809,7 @@ EN_timerError_T TIMER_delay(uint16_t millisec) {
  8ae:	d0 e0       	ldi	r29, 0x00	; 0
  8b0:	35 c0       	rjmp	.+106    	; 0x91c <__stack+0xbd>
 
-    }else if(millisec == (uint32_t)tMax){
+    }else if(millisec == ((uint32_t)tMax)){
  8b2:	c1 34       	cpi	r28, 0x41	; 65
  8b4:	d1 05       	cpc	r29, r1
  8b6:	79 f1       	breq	.+94     	; 0x916 <__stack+0xb7>
@@ -1858,10 +1858,10 @@ EN_timerError_T TIMER_delay(uint16_t millisec) {
  910:	0e 94 ab 05 	call	0xb56	; 0xb56 <__fixunssfsi>
  914:	03 c0       	rjmp	.+6      	; 0x91c <__stack+0xbd>
     if(millisec<tMax){
-        tmrInitial = (tMax-millisec)/tTick;
+        tmrInitial = ((tMax-millisec)/tTick);
         N = 1;
 
-    }else if(millisec == (uint32_t)tMax){
+    }else if(millisec == ((uint32_t)tMax)){
         tmrInitial=0;
  916:	60 e0       	ldi	r22, 0x00	; 0
         N=1;
@@ -1891,36 +1891,33 @@ EN_timerError_T TIMER_delay(uint16_t millisec) {
     }
     TCNT0 = tmrInitial;
     SET_BIT(TCCR0,BIT_2);//set 256 prescaler
-    while(overFlowcnt<N){
+	for(overFlowcnt;overFlowcnt<N;overFlowcnt++){
  928:	08 c0       	rjmp	.+16     	; 0x93a <__stack+0xdb>
-        //busy wait
-        while(CHECK_BIT(TIFR,BIT_0)==LOW);
+    //while(overFlowcnt<N){
+        while(CHECK_BIT(TIFR,BIT_0)==LOW); //busy wait
  92a:	08 b6       	in	r0, 0x38	; 56
  92c:	00 fe       	sbrs	r0, 0
  92e:	fd cf       	rjmp	.-6      	; 0x92a <__stack+0xcb>
-        //clear overflow flag
-        SET_BIT(TIFR,BIT_0);
+        SET_BIT(TIFR,BIT_0);// overflow flag to zero
  930:	88 b7       	in	r24, 0x38	; 56
  932:	81 60       	ori	r24, 0x01	; 1
  934:	88 bf       	out	0x38, r24	; 56
-        //increment counter
-        overFlowcnt++;
- 936:	2f 5f       	subi	r18, 0xFF	; 255
- 938:	3f 4f       	sbci	r19, 0xFF	; 255
         tmrInitial = (1<<8) - ((int64_t )millisec/tTick)/N;
 
     }
     TCNT0 = tmrInitial;
     SET_BIT(TCCR0,BIT_2);//set 256 prescaler
-    while(overFlowcnt<N){
+	for(overFlowcnt;overFlowcnt<N;overFlowcnt++){
+ 936:	2f 5f       	subi	r18, 0xFF	; 255
+ 938:	3f 4f       	sbci	r19, 0xFF	; 255
  93a:	2c 17       	cp	r18, r28
  93c:	3d 07       	cpc	r19, r29
  93e:	a8 f3       	brcs	.-22     	; 0x92a <__stack+0xcb>
-        SET_BIT(TIFR,BIT_0);
-        //increment counter
-        overFlowcnt++;
+        while(CHECK_BIT(TIFR,BIT_0)==LOW); //busy wait
+        SET_BIT(TIFR,BIT_0);// overflow flag to zero
+        
     }
-    //Timer stop
+    //Timer stopper
     TIMER_init();
  940:	0e 94 1c 04 	call	0x838	; 0x838 <TIMER_init>
     return TIMER_OK;
@@ -1933,9 +1930,9 @@ EN_timerError_T TIMER_delay(uint16_t millisec) {
     if(millisec>10000)
         return LARGE_DELAY;
  948:	81 e0       	ldi	r24, 0x01	; 1
-        overFlowcnt++;
+        
     }
-    //Timer stop
+    //Timer stopper
     TIMER_init();
     return TIMER_OK;
 }
